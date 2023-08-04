@@ -1,4 +1,4 @@
-Nic Port Info
+Ethernet Info
 ---------------------
 The crate provides a way to get the link information of the interface, including
 the port type, supported modes.
