@@ -1,0 +1,15 @@
+[package]
+name = "ethernet-info"
+version = "0.0.1-alphav1"
+edition = "2021"
+homepage = "https://github.com/ssfdust/ethernet-info-rs"
+description = "A library uses SIOCETHTOOL ioctl command to get ethernet information"
+license-file = "LICENSE"
+documentation = "https://docs.rs/ethernet-info"
+repository = "https://github.com/ssfdust/ethernet-info-rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+libc = "0.2.140"
+nix = { version = "0.26.2", features = ["ioctl"] }
