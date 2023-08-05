@@ -36,15 +36,6 @@ ioctl_readwrite_bad!(ethtool_ioctl, libc::SIOCETHTOOL, ifreq);
 /// * `update_ifr_from_ethtool_cmd` - Update the ifreq struct from the EthtoolCommnad.
 /// * `send_ioctl` - Send the ioctl command to the kernel.
 /// * `close_socket` - Close the socket.
-///
-/// Example:
-/// ```
-/// use ethernet_info::internal::CmdContext;
-/// let mut ecmd = EthtoolCommnad::new(ETHTOOL_GLINKSETTINGS).unwrap();
-/// let mut cmd_context = Context::new("eth0").unwrap();
-/// cmd_context = cmd_context.send_ioctl(ecmd).unwrap();
-/// ecmd = cmd_context.get_ethtool_link_settings();
-/// ```
 #[repr(C)]
 #[derive(Clone)]
 pub struct CmdContext {
@@ -77,7 +68,6 @@ pub struct EthtoolLinkSettings {
     pub reserved: [u32; 7],
     pub link_mode_masks: [u32; 0],
 }
-
 
 /// # EthtoolCommnad
 /// EthtoolCommnad is emulating the C struct defined in ethtool.h
@@ -116,7 +106,8 @@ impl EthtoolCommnad {
                 self.req.link_mode_masks_nwords as usize,
             );
 
-            supported_link_modes_u32[..supported_link_modes.len()].copy_from_slice(&supported_link_modes);
+            supported_link_modes_u32[..supported_link_modes.len()]
+                .copy_from_slice(&supported_link_modes);
             let settings_parser = SettingsParser::new(self.req.port, &supported_link_modes_u32);
 
             EthernetInfo::from_settings_parser(&devname, settings_parser)
@@ -186,7 +177,7 @@ impl CmdContext {
             ifr_name: str_to_i8_arr(&self.devname),
             ifr_ifru: libc::__c_anonymous_ifr_ifru {
                 ifru_data: unsafe { transmute(&mut ecmd as *mut _) },
-            }
+            },
         };
         let ret = unsafe { ethtool_ioctl(self.fd, &mut self.ifr) };
         if ret.is_ok() {

@@ -11,5 +11,6 @@ repository = "https://github.com/ssfdust/ethernet-info-rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+enum-iterator = "1.4.1"
 libc = "0.2.140"
 nix = { version = "0.26.2", features = ["ioctl"] }

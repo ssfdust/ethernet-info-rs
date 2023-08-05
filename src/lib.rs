@@ -17,7 +17,7 @@
 //! Get the ethtool related information of the specified interface.
 //! ```
 //! use ethernet_info::get_ethernet_info;
-//! let interfaces_eth_info = get_ethernet_info(Some("eth0"));
+//! let interfaces_eth_info = get_ethernet_info(Some("enp1s0"));
 //! for interface_info in interfaces_eth_info {
 //!     println!("interface: {}", interface_info.name());
 //!     println!("Port: {}", interface_info.port());
@@ -28,7 +28,7 @@
 //! Get the ethtool related of the specified interface by EthernetInfo.
 //! ```
 //! use ethernet_info::EthernetInfo;
-//! let interface_info = EthernetInfo::from_name("eth0").unwrap();
+//! let interface_info = EthernetInfo::from_name("enp1s0").unwrap();
 //! println!("interface: {}", interface_info.name());
 //! println!("Port: {}", interface_info.port());
 //! println!("Supported: {:?}", interface_info.supported());
@@ -53,8 +53,9 @@ pub use errors::EthtoolError;
 #[derive(Default, Debug, Clone)]
 pub struct EthernetInfo {
     name: String,
-    port: String,
-    supported: Vec<String>,
+    port: EthtoolPort,
+    ports: Vec<EthtoolPortBits>,
+    supported: Vec<EthtoolLinkModeBits>,
 }
 
 impl EthernetInfo {
@@ -64,6 +65,7 @@ impl EthernetInfo {
         EthernetInfo {
             name: name.to_string(),
             port: settings_parser.port(),
+            ports: settings_parser.supported_ports(),
             supported,
         }
     }
@@ -74,12 +76,16 @@ impl EthernetInfo {
     }
 
     /// Get the port type of the interface
-    pub fn port(&self) -> &str {
-        &self.port
+    pub fn port(&self) -> EthtoolPort {
+        self.port
+    }
+
+    pub fn ports(&self) -> &Vec<EthtoolPortBits> {
+        &self.ports
     }
 
     /// Get the supported modes of the interface
-    pub fn supported(&self) -> &Vec<String> {
+    pub fn supported(&self) -> &Vec<EthtoolLinkModeBits> {
         &self.supported
     }
 
@@ -90,7 +96,6 @@ impl EthernetInfo {
         Ok(port)
     }
 }
-
 
 /// Use ioctl to get the port information of the interface
 ///
@@ -131,7 +136,6 @@ fn do_ioctl_get_ethernet_info(mut ctx: CmdContext) -> Result<EthernetInfo, Ethto
     Ok(ecmd.into_ethernet_info(ctx.ifname()))
 }
 
-
 /// Get the ethtool related information of the interface
 /// If devname is None, get all the interfaces' ethtool related information.
 /// If devname is Some(&str), get the specified interface's ethtool related information.
@@ -145,10 +149,12 @@ pub fn get_ethernet_info(devname: Option<&str>) -> Vec<EthernetInfo> {
     } else {
         if let Ok(interfaces) = nix::net::if_::if_nameindex() {
             for iface in interfaces.iter() {
-                if let Ok(ethernet_info) = EthernetInfo::from_name(iface.name().to_string_lossy().as_ref()) {
+                if let Ok(ethernet_info) =
+                    EthernetInfo::from_name(iface.name().to_string_lossy().as_ref())
+                {
                     ethernet_info_vec.push(ethernet_info);
                 }
-            };
+            }
         }
     }
     ethernet_info_vec

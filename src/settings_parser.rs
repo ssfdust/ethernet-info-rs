@@ -1,7 +1,10 @@
 //! This module contains the SettingsParser struct and its implementation.
 //! The SettingsParser struct is used to parse the bit settings of a network
 //! interface.
-use crate::ethtool_const::*;
+use crate::ethtool_const::{
+    EthtoolLinkModeBits, EthtoolPortBits, ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NBITS, EthtoolPort,
+};
+use enum_iterator::all;
 
 /// # SettingsParser
 /// The SettingsParser struct is used to parse the bit settings of a network
@@ -23,36 +26,39 @@ impl<'a> SettingsParser<'a> {
         }
     }
 
-    /// Returns the supported modes of the network interface.
-    pub fn supported_link_modes(&'a self) -> Vec<String> {
+    /// Returns the supported port types of the network interface.
+    pub fn supported_ports(&'a self) -> Vec<EthtoolPortBits> {
         let mut modes = Vec::new();
-        for (bit, mode) in ETHTOOL_PORT_BIT_MODES.iter() {
-            if ethtool_link_mode_test_bit(*bit, self.supported_link_modes) {
-                modes.push(mode.to_string());
+
+        for mode in all::<EthtoolPortBits>() {
+            if ethtool_link_mode_test_bit(mode as u32, self.supported_link_modes) {
+                modes.push(mode);
             }
         }
+        modes
+    }
 
-        for (bit, mode) in ETHTOOL_SUPPORTED_BIT_MODES.iter() {
-            if ethtool_link_mode_test_bit(*bit, self.supported_link_modes) {
-                modes.push(mode.to_string());
+    /// Returns the supported modes of the network interface.
+    pub fn supported_link_modes(&'a self) -> Vec<EthtoolLinkModeBits> {
+        let mut modes = Vec::new();
+
+        for mode in all::<EthtoolLinkModeBits>() {
+            if ethtool_link_mode_test_bit(mode as u32, self.supported_link_modes) {
+                modes.push(mode);
             }
         }
         modes
     }
 
     /// Returns the port type of the network interface.
-    pub fn port(&'a self) -> String {
-        match self.port {
-            0 => "Twisted Pair".into(),
-            1 => "AUI".into(),
-            4 => "BNC".into(),
-            2 => "MII".into(),
-            3 => "FIBRE".into(),
-            5 => "Direct Attach Cable".into(),
-            239 => "None".into(),
-            255 => "Other".into(),
-            _ => "Unknown".into(),
+    pub fn port(&'a self) -> EthtoolPort {
+        let mode = EthtoolPort::ETHTOOL_LINK_MODE_Unknown_BIT;
+        for mode in all::<EthtoolPort>() {
+            if mode as u8 == self.port {
+                return mode
+            }
         }
+        mode
     }
 }
 

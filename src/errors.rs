@@ -4,6 +4,7 @@
 use std::error::Error;
 use std::fmt;
 
+/// The error type for this crate.
 #[derive(Debug)]
 pub struct EthtoolError {
     details: String,
@@ -23,8 +24,4 @@ impl fmt::Display for EthtoolError {
     }
 }
 
-impl Error for EthtoolError {
-    fn description(&self) -> &str {
-        &self.details
-    }
-}
+impl Error for EthtoolError {}
