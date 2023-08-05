@@ -1,6 +1,6 @@
 //! This module contains helper functions for parsering the ethtool command.
-use std::process::Command;
 use nix::net::if_::if_nameindex;
+use std::process::Command;
 
 /// This struct contains the parsed output of the ethtool command.
 #[derive(Debug)]

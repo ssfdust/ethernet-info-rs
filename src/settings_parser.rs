@@ -2,7 +2,7 @@
 //! The SettingsParser struct is used to parse the bit settings of a network
 //! interface.
 use crate::ethtool_const::{
-    EthtoolLinkModeBits, EthtoolPortBits, ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NBITS, EthtoolPort,
+    EthtoolLinkModeBits, EthtoolPort, EthtoolPortBits, ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NBITS,
 };
 use enum_iterator::all;
 
@@ -55,7 +55,7 @@ impl<'a> SettingsParser<'a> {
         let mode = EthtoolPort::Unknown_PORT;
         for mode in all::<EthtoolPort>() {
             if mode as u8 == self.port {
-                return mode
+                return mode;
             }
         }
         mode

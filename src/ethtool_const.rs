@@ -34,7 +34,6 @@ impl Display for EthtoolPortBits {
     }
 }
 
-
 /// The enumerate type represents the port type of the interface
 #[derive(Debug, PartialEq, Sequence, Clone, Copy)]
 pub enum EthtoolPort {
