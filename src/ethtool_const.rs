@@ -38,20 +38,20 @@ impl Display for EthtoolPortBits {
 /// The enumerate type represents the port type of the interface
 #[derive(Debug, PartialEq, Sequence, Clone, Copy)]
 pub enum EthtoolPort {
-    ETHTOOL_LINK_MODE_BNC_BIT = 11,
-    ETHTOOL_LINK_MODE_FIBRE_BIT = 10,
-    ETHTOOL_LINK_MODE_MII_BIT = 9,
-    ETHTOOL_LINK_MODE_AUI_BIT = 8,
-    ETHTOOL_LINK_MODE_TP_BIT = 7,
-    ETHTOOL_LINK_MODE_Backplane_BIT = 16,
-    ETHTOOL_LINK_MODE_None_BIT = 239,
-    ETHTOOL_LINK_MODE_Other_BIT = 255,
-    ETHTOOL_LINK_MODE_Unknown_BIT = 0,
+    Twisted_Pari_PORT = 0,
+    AUI_PORT = 1,
+    MII_PORT = 2,
+    FIIBRE_PORT = 3,
+    BNC_PORT = 4,
+    Direct_Attach_Cable_PORT = 5,
+    None_PORT = 239,
+    Other_PORT = 255,
+    Unknown_PORT = -1,
 }
 
 impl Default for EthtoolPort {
     fn default() -> Self {
-        EthtoolPort::ETHTOOL_LINK_MODE_Unknown_BIT
+        EthtoolPort::Unknown_PORT
     }
 }
 
@@ -60,9 +60,9 @@ impl Display for EthtoolPort {
         match *self as u8 {
             0 => write!(f, "Twisted Pair"),
             1 => write!(f, "AUI"),
-            4 => write!(f, "BNC"),
             2 => write!(f, "MII"),
             3 => write!(f, "FIBRE"),
+            4 => write!(f, "BNC"),
             5 => write!(f, "Direct Attach Cable"),
             239 => write!(f, "None"),
             255 => write!(f, "Other"),

@@ -52,7 +52,7 @@ impl<'a> SettingsParser<'a> {
 
     /// Returns the port type of the network interface.
     pub fn port(&'a self) -> EthtoolPort {
-        let mode = EthtoolPort::ETHTOOL_LINK_MODE_Unknown_BIT;
+        let mode = EthtoolPort::Unknown_PORT;
         for mode in all::<EthtoolPort>() {
             if mode as u8 == self.port {
                 return mode
