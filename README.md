@@ -1,10 +1,11 @@
 Ethernet Info
----------------------
+====================
 The crate provides a way to get the link information of the interface, including
 the port type, supported modes.
 The crate is based on the ioctl command, so it can only be used on Linux.
 
-# Examples
+Examples
+---------------------
 List all the interfaces' ethtool related information.
 ```rust
 use ethernet_info::get_ethernet_info;
