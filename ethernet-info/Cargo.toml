@@ -1,6 +1,6 @@
 [package]
 name = "ethernet-info"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 homepage = "https://github.com/ssfdust/ethernet-info-rs"
 description = "A library uses SIOCETHTOOL ioctl command to get ethernet information"
