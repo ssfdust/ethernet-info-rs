@@ -9,7 +9,7 @@ fn main() -> Result<()> {
 
 /// Update bdage file when the badge is not up to date
 ///
-/// Get the modified time of the badge file (flat.svg) and compare it to the 
+/// Get the modified time of the badge file (flat.svg) and compare it to the
 /// flat.svg in assets directory. If the badge is not up to date, copy the
 /// badge from coverage/html/badges/flat.svg to assets/flat.svg
 fn update_badge_for_coverage() -> Result<()> {
