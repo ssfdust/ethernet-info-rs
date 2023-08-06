@@ -115,7 +115,8 @@ impl EthtoolCommnad {
 
             // move the pointer to the advertised link modes. The size of the
             // supported link modes is link_mode_masks_nwords.
-            link_mode_data_ptr = link_mode_data_ptr.offset(self.req.link_mode_masks_nwords as isize);
+            link_mode_data_ptr =
+                link_mode_data_ptr.offset(self.req.link_mode_masks_nwords as isize);
 
             // read the advertised link modes from the link_mode_data pointer
             // and copy it to the array.
@@ -126,7 +127,11 @@ impl EthtoolCommnad {
             advertised_link_modes_u32[..advertised_link_modes.len()]
                 .copy_from_slice(advertised_link_modes);
 
-            let settings_parser = SettingsParser::new(self.req.port, &supported_link_modes_u32, &advertised_link_modes_u32);
+            let settings_parser = SettingsParser::new(
+                self.req.port,
+                &supported_link_modes_u32,
+                &advertised_link_modes_u32,
+            );
 
             EthernetInfo::from_settings_parser(devname, settings_parser)
         }

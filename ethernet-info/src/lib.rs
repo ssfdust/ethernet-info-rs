@@ -159,13 +159,13 @@ pub fn get_ethernet_info(devname: Option<&str>) -> Vec<EthernetInfo> {
             ethernet_info_vec.push(ethernet_info);
         }
     } else if let Ok(interfaces) = nix::net::if_::if_nameindex() {
-            for iface in interfaces.iter() {
-                if let Ok(ethernet_info) =
-                    EthernetInfo::try_from(iface.name().to_string_lossy().as_ref())
-                {
-                    ethernet_info_vec.push(ethernet_info);
-                }
+        for iface in interfaces.iter() {
+            if let Ok(ethernet_info) =
+                EthernetInfo::try_from(iface.name().to_string_lossy().as_ref())
+            {
+                ethernet_info_vec.push(ethernet_info);
             }
         }
+    }
     ethernet_info_vec
 }

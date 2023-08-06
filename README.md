@@ -1,5 +1,10 @@
 Ethernet Info
 ====================
+[![crates.io](https://img.shields.io/crates/v/ethernet-info)](https://crates.io/crates/ethernet-info)
+[![docs.rs](https://img.shields.io/docsrs/ethernet-info)](https://img.shields.io/docsrs/ethernet-info)
+[![ci](https://github.com/ssfdust/ethernet-info-rs/actions/workflows/coverage.yml/badge.svg)](https://github.com/ssfdust/ethernet-info-rs/actions/workflows/coverage.yml)
+[![coverage](https://raw.githubusercontent.com/ssfdust/ethernet-info-rs/ci/assets/flat.svg)](https://github.com/ssfdust/ethernet-info-rs/actions/workflows/coverage.yml)
+
 The crate provides a way to get the link information of the interface, including
 the port type, supported modes.
 The crate is based on the ioctl command, so it can only be used on Linux.

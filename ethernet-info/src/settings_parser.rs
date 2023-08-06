@@ -20,11 +20,15 @@ pub struct SettingsParser<'a> {
 }
 
 impl<'a> SettingsParser<'a> {
-    pub fn new(port: u8, supported_link_modes: &'a [u32], advertised_link_modes: &'a [u32]) -> SettingsParser<'a> {
+    pub fn new(
+        port: u8,
+        supported_link_modes: &'a [u32],
+        advertised_link_modes: &'a [u32],
+    ) -> SettingsParser<'a> {
         SettingsParser {
             port,
             supported_link_modes,
-            advertised_link_modes
+            advertised_link_modes,
         }
     }
 

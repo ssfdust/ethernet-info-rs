@@ -437,8 +437,8 @@ impl Display for EthtoolLinkModeBits {
 
 #[cfg(test)]
 mod test {
-    use enum_iterator::all;
     use super::*;
+    use enum_iterator::all;
 
     #[test]
     fn walk_accross_ethtool_constants() {
