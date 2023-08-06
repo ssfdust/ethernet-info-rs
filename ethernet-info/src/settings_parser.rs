@@ -16,13 +16,15 @@ use enum_iterator::all;
 pub struct SettingsParser<'a> {
     port: u8,
     supported_link_modes: &'a [u32],
+    advertised_link_modes: &'a [u32],
 }
 
 impl<'a> SettingsParser<'a> {
-    pub fn new(port: u8, supported_link_modes: &'a [u32]) -> SettingsParser<'a> {
+    pub fn new(port: u8, supported_link_modes: &'a [u32], advertised_link_modes: &'a [u32]) -> SettingsParser<'a> {
         SettingsParser {
             port,
             supported_link_modes,
+            advertised_link_modes
         }
     }
 
@@ -50,9 +52,21 @@ impl<'a> SettingsParser<'a> {
         modes
     }
 
+    /// Returns the supported modes of the network interface.
+    pub fn advertised_link_modes(&'a self) -> Vec<EthtoolLinkModeBits> {
+        let mut modes = Vec::new();
+
+        for mode in all::<EthtoolLinkModeBits>() {
+            if ethtool_link_mode_test_bit(mode as u32, self.advertised_link_modes) {
+                modes.push(mode);
+            }
+        }
+        modes
+    }
+
     /// Returns the port type of the network interface.
     pub fn port(&'a self) -> EthtoolPort {
-        let mode = EthtoolPort::Unknown_PORT;
+        let mode = EthtoolPort::default();
         for mode in all::<EthtoolPort>() {
             if mode as u8 == self.port {
                 return mode;

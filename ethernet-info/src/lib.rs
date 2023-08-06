@@ -28,10 +28,11 @@
 //! Get the ethtool related of the specified interface by EthernetInfo.
 //! ```
 //! use ethernet_info::EthernetInfo;
-//! let interface_info = EthernetInfo::from_name("enp1s0").unwrap();
-//! println!("interface: {}", interface_info.name());
-//! println!("Port: {}", interface_info.port());
-//! println!("Supported: {:?}", interface_info.supported());
+//! if let Ok(interface_info) = EthernetInfo::try_from("enp1s0") {
+//!     println!("interface: {}", interface_info.name());
+//!     println!("Port: {}", interface_info.port());
+//!     println!("Supported: {:?}", interface_info.supported());
+//! }
 //! ```
 #![allow(non_upper_case_globals)]
 
@@ -50,22 +51,25 @@ use internal::{CmdContext, EthtoolCommnad};
 pub use errors::EthtoolError;
 
 /// The port information includes the port type, supported modes.
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct EthernetInfo {
     name: String,
     port: EthtoolPort,
     ports: Vec<EthtoolPortBits>,
     supported: Vec<EthtoolLinkModeBits>,
+    advertised: Vec<EthtoolLinkModeBits>,
 }
 
 impl EthernetInfo {
     /// Create a EthernetInfo from the SettingsParser
     pub fn from_settings_parser(name: &str, settings_parser: SettingsParser) -> Self {
         let supported = settings_parser.supported_link_modes();
+        let advertised = settings_parser.advertised_link_modes();
         EthernetInfo {
             name: name.to_string(),
             port: settings_parser.port(),
             ports: settings_parser.supported_ports(),
+            advertised,
             supported,
         }
     }
@@ -89,11 +93,19 @@ impl EthernetInfo {
         &self.supported
     }
 
+    pub fn advertised(&self) -> &Vec<EthtoolLinkModeBits> {
+        &self.advertised
+    }
+}
+
+impl TryFrom<&str> for EthernetInfo {
+    type Error = EthtoolError;
+
     /// Create a EthernetInfo from the interface name
-    pub fn from_name(name: &str) -> Result<Self, EthtoolError> {
+    fn try_from(name: &str) -> Result<Self, Self::Error> {
         let ctx = CmdContext::new(name)?;
-        let port = do_ioctl_get_ethernet_info(ctx)?;
-        Ok(port)
+        let ethernet_info = do_ioctl_get_ethernet_info(ctx)?;
+        Ok(ethernet_info)
     }
 }
 
@@ -142,20 +154,18 @@ fn do_ioctl_get_ethernet_info(mut ctx: CmdContext) -> Result<EthernetInfo, Ethto
 pub fn get_ethernet_info(devname: Option<&str>) -> Vec<EthernetInfo> {
     let mut ethernet_info_vec = Vec::new();
     if let Some(devname) = devname {
-        let ethernet_info = EthernetInfo::from_name(devname);
+        let ethernet_info = EthernetInfo::try_from(devname);
         if let Ok(ethernet_info) = ethernet_info {
             ethernet_info_vec.push(ethernet_info);
         }
-    } else {
-        if let Ok(interfaces) = nix::net::if_::if_nameindex() {
+    } else if let Ok(interfaces) = nix::net::if_::if_nameindex() {
             for iface in interfaces.iter() {
                 if let Ok(ethernet_info) =
-                    EthernetInfo::from_name(iface.name().to_string_lossy().as_ref())
+                    EthernetInfo::try_from(iface.name().to_string_lossy().as_ref())
                 {
                     ethernet_info_vec.push(ethernet_info);
                 }
             }
         }
-    }
     ethernet_info_vec
 }

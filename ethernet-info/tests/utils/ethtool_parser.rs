@@ -9,6 +9,7 @@ pub struct EthtoolOutput {
     pub port: Option<String>,
     pub supported_ports: Vec<String>,
     pub supported_link_modes: Vec<String>,
+    pub advertised_link_modes: Vec<String>,
 }
 
 impl TryFrom<&str> for EthtoolOutput {
@@ -21,6 +22,11 @@ impl TryFrom<&str> for EthtoolOutput {
         // Get the supported link modes and ports.
         let supported_link_modes = parse_ethtool_output(
             "Supported link modes",
+            output.iter().map(|s| s.as_str()).collect(),
+        );
+        // Get the advertised link modes.
+        let advertised_link_modes = parse_ethtool_output(
+            "Advertised link modes",
             output.iter().map(|s| s.as_str()).collect(),
         );
         // Get the supported ports. We need to filter out the "[" and "]" characters.
@@ -49,6 +55,7 @@ impl TryFrom<&str> for EthtoolOutput {
             port,
             supported_ports,
             supported_link_modes,
+            advertised_link_modes,
         })
     }
 }

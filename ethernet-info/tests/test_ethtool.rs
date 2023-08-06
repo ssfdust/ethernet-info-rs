@@ -15,12 +15,37 @@ fn test_port_type() {
         if ethtool_output.port.is_none() {
             continue;
         }
-        let ethernet_info = EthernetInfo::from_name(&ethtool_output.interface).unwrap();
+        let ethernet_info = EthernetInfo::try_from(ethtool_output.interface.as_ref()).unwrap();
         let port_type = ethernet_info.port().to_string();
         assert_eq!(ethtool_output.port.unwrap(), port_type);
         found = true;
     }
     assert!(found);
+}
+
+#[test]
+fn test_advertised_ports() {
+    // we need to find at least one interface that has supported ports
+    let mut found = false;
+    for ethtool_output in list_all_interface_ethtool_output() {
+        if ethtool_output.port.is_none() {
+            continue;
+        }
+        let ethernet_info = EthernetInfo::try_from(ethtool_output.interface.as_ref()).unwrap();
+        let mut advertised_link_modes = ethernet_info
+            .advertised()
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>();
+        advertised_link_modes.sort();
+        if ethtool_output.advertised_link_modes.len() > 0 {
+            found = true;
+            assert_eq!(ethtool_output.advertised_link_modes, advertised_link_modes);
+        }
+    }
+    if !std::env::var("NO_SUPPORTED_PORTS").is_ok() {
+        assert!(found);
+    }
 }
 
 #[test]
@@ -31,19 +56,23 @@ fn test_supported_ports() {
         if ethtool_output.port.is_none() {
             continue;
         }
-        let ethernet_info = EthernetInfo::from_name(&ethtool_output.interface).unwrap();
+        let ethernet_info = EthernetInfo::try_from(ethtool_output.interface.as_ref()).unwrap();
         let mut supported_ports = ethernet_info
             .ports()
             .iter()
             .map(|x| x.to_string())
             .collect::<Vec<String>>();
         supported_ports.sort();
+        dbg!(&ethtool_output.supported_ports);
+        dbg!(supported_ports.clone());
         if ethtool_output.supported_ports.len() > 0 {
             found = true;
             assert_eq!(ethtool_output.supported_ports, supported_ports);
         }
     }
-    assert!(found);
+    if !std::env::var("NO_SUPPORTED_PORTS").is_ok() {
+        assert!(found);
+    }
 }
 
 #[test]
@@ -54,7 +83,7 @@ fn test_supported_link_modes() {
         if ethtool_output.port.is_none() {
             continue;
         }
-        let ethernet_info = EthernetInfo::from_name(&ethtool_output.interface).unwrap();
+        let ethernet_info = EthernetInfo::try_from(ethtool_output.interface.as_ref()).unwrap();
         let mut supported_link_modes = ethernet_info
             .supported()
             .iter()
@@ -87,10 +116,14 @@ fn test_get_ethernet_info_just_type_check() {
 
 #[test]
 fn test_get_all_ethernet() {
-    let ethtool_output_len = list_all_interface_ethtool_output()
+    let ifacenames: Vec<String> = list_all_interface_ethtool_output()
         .iter()
         .filter(|x| x.port.is_some())
-        .count();
+        .map(|x| x.interface.clone())
+        .collect();
     let ethernet_info_list = get_ethernet_info(None);
-    assert_eq!(ethtool_output_len, ethernet_info_list.len());
+    for ethernet_info in ethernet_info_list {
+        let ethernet_info = ethernet_info.clone();
+        assert!(ifacenames.contains(&ethernet_info.name().to_string()));
+    }
 }

@@ -11,7 +11,7 @@ pub const ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NU32: usize = i8::MAX as usize;
 pub const ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NBITS: u32 = 32 * i8::MAX as u32;
 
 /// The enumerate type represents the bits of the supported port
-#[derive(Debug, PartialEq, Sequence, Clone, Copy)]
+#[derive(Debug, Sequence, Clone, Copy)]
 pub enum EthtoolPortBits {
     ETHTOOL_LINK_MODE_BNC_BIT = 11,
     ETHTOOL_LINK_MODE_FIBRE_BIT = 10,
@@ -35,7 +35,7 @@ impl Display for EthtoolPortBits {
 }
 
 /// The enumerate type represents the port type of the interface
-#[derive(Debug, PartialEq, Sequence, Clone, Copy)]
+#[derive(Debug, Sequence, Clone, Copy, Default)]
 pub enum EthtoolPort {
     Twisted_Pari_PORT = 0,
     AUI_PORT = 1,
@@ -45,13 +45,8 @@ pub enum EthtoolPort {
     Direct_Attach_Cable_PORT = 5,
     None_PORT = 239,
     Other_PORT = 255,
+    #[default]
     Unknown_PORT = -1,
-}
-
-impl Default for EthtoolPort {
-    fn default() -> Self {
-        EthtoolPort::Unknown_PORT
-    }
 }
 
 impl Display for EthtoolPort {
@@ -436,6 +431,30 @@ impl Display for EthtoolLinkModeBits {
             EthtoolLinkModeBits::ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half_BIT => {
                 write!(f, "10baseT1S/Half")
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use enum_iterator::all;
+    use super::*;
+
+    #[test]
+    fn walk_accross_ethtool_constants() {
+        for item in all::<EthtoolPort>() {
+            format!("{:?}", item);
+            item.to_string();
+        }
+
+        for item in all::<EthtoolPortBits>() {
+            format!("{:?}", item);
+            item.to_string();
+        }
+
+        for item in all::<EthtoolLinkModeBits>() {
+            format!("{:?}", item);
+            item.to_string();
         }
     }
 }

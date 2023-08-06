@@ -25,3 +25,14 @@ impl fmt::Display for EthtoolError {
 }
 
 impl Error for EthtoolError {}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test_errors() {
+        use super::EthtoolError;
+        let err = EthtoolError::new("test");
+        format!("{:?}", err);
+        assert_eq!(err.to_string(), "test");
+    }
+}

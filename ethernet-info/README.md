@@ -30,8 +30,9 @@ for interface_info in interfaces_eth_info {
 Get the ethtool related of the specified interface by EthernetInfo.
 ```rust
 use ethernet_info::EthernetInfo;
-let interface_info = EthernetInfo::from_name("eth0").unwrap();
-println!("interface: {}", interface_info.name());
-println!("Port: {}", interface_info.port());
-println!("Supported: {:?}", interface_info.supported());
+if let Ok(interface_info) = EthernetInfo::try_from("eth0") {
+    println!("interface: {}", interface_info.name());
+    println!("Port: {}", interface_info.port());
+    println!("Supported: {:?}", interface_info.supported());
+}
 ```

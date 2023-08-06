@@ -100,17 +100,35 @@ impl EthtoolCommnad {
     pub fn into_ethernet_info(self, devname: &str) -> EthernetInfo {
         unsafe {
             let mut supported_link_modes_u32 = [0u32; ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NU32];
-            let link_mode_data_ptr = self.link_mode_data.as_ptr();
+            let mut advertised_link_modes_u32 = [0u32; ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NU32];
+
+            let mut link_mode_data_ptr = self.link_mode_data.as_ptr();
+
+            // read the supported link modes from the link_mode_data pointer
+            // and copy it to the array.
             let supported_link_modes = std::slice::from_raw_parts(
                 link_mode_data_ptr,
                 self.req.link_mode_masks_nwords as usize,
             );
-
             supported_link_modes_u32[..supported_link_modes.len()]
-                .copy_from_slice(&supported_link_modes);
-            let settings_parser = SettingsParser::new(self.req.port, &supported_link_modes_u32);
+                .copy_from_slice(supported_link_modes);
 
-            EthernetInfo::from_settings_parser(&devname, settings_parser)
+            // move the pointer to the advertised link modes. The size of the
+            // supported link modes is link_mode_masks_nwords.
+            link_mode_data_ptr = link_mode_data_ptr.offset(self.req.link_mode_masks_nwords as isize);
+
+            // read the advertised link modes from the link_mode_data pointer
+            // and copy it to the array.
+            let advertised_link_modes = std::slice::from_raw_parts(
+                link_mode_data_ptr,
+                self.req.link_mode_masks_nwords as usize,
+            );
+            advertised_link_modes_u32[..advertised_link_modes.len()]
+                .copy_from_slice(advertised_link_modes);
+
+            let settings_parser = SettingsParser::new(self.req.port, &supported_link_modes_u32, &advertised_link_modes_u32);
+
+            EthernetInfo::from_settings_parser(devname, settings_parser)
         }
     }
 }

@@ -13,3 +13,4 @@ Cargo.lock
 # Coverage html file
 coverage.html
 profiles
+coverage/
