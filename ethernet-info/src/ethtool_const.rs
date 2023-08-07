@@ -13,23 +13,37 @@ pub const ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NBITS: u32 = 32 * i8::MAX as u32;
 /// The enumerate type represents the bits of the supported port
 #[derive(Debug, Sequence, Clone, Copy)]
 pub enum EthtoolPortBits {
+    ETHTOOL_LINK_MODE_Autoneg_BIT = 6,
+    ETHTOOL_LINK_MODE_Pause_BIT = 13,
+    ETHTOOL_LINK_MODE_Asym_Pause_BIT = 14,
     ETHTOOL_LINK_MODE_BNC_BIT = 11,
     ETHTOOL_LINK_MODE_FIBRE_BIT = 10,
     ETHTOOL_LINK_MODE_MII_BIT = 9,
     ETHTOOL_LINK_MODE_AUI_BIT = 8,
     ETHTOOL_LINK_MODE_TP_BIT = 7,
     ETHTOOL_LINK_MODE_Backplane_BIT = 16,
+    ETHTOOL_LINK_MODE_FEC_NONE_BIT = 49,
+    ETHTOOL_LINK_MODE_FEC_RS_BIT = 50,
+    ETHTOOL_LINK_MODE_FEC_BASER_BIT = 51,
+    ETHTOOL_LINK_MODE_FEC_LLRS_BIT = 74,
 }
 
 impl Display for EthtoolPortBits {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            EthtoolPortBits::ETHTOOL_LINK_MODE_BNC_BIT => write!(f, "BNC"),
-            EthtoolPortBits::ETHTOOL_LINK_MODE_FIBRE_BIT => write!(f, "FIBRE"),
-            EthtoolPortBits::ETHTOOL_LINK_MODE_MII_BIT => write!(f, "MII"),
-            EthtoolPortBits::ETHTOOL_LINK_MODE_AUI_BIT => write!(f, "AUI"),
-            EthtoolPortBits::ETHTOOL_LINK_MODE_TP_BIT => write!(f, "TP"),
-            EthtoolPortBits::ETHTOOL_LINK_MODE_Backplane_BIT => write!(f, "BACKPLANE"),
+            Self::ETHTOOL_LINK_MODE_Pause_BIT => write!(f, "Pause"),
+            Self::ETHTOOL_LINK_MODE_Asym_Pause_BIT => write!(f, "Asym_Pause"),
+            Self::ETHTOOL_LINK_MODE_Autoneg_BIT => write!(f, "Autoneg"),
+            Self::ETHTOOL_LINK_MODE_BNC_BIT => write!(f, "BNC"),
+            Self::ETHTOOL_LINK_MODE_FIBRE_BIT => write!(f, "FIBRE"),
+            Self::ETHTOOL_LINK_MODE_MII_BIT => write!(f, "MII"),
+            Self::ETHTOOL_LINK_MODE_AUI_BIT => write!(f, "AUI"),
+            Self::ETHTOOL_LINK_MODE_TP_BIT => write!(f, "TP"),
+            Self::ETHTOOL_LINK_MODE_Backplane_BIT => write!(f, "BACKPLANE"),
+            Self::ETHTOOL_LINK_MODE_FEC_NONE_BIT => write!(f, "FEC_NONE"),
+            Self::ETHTOOL_LINK_MODE_FEC_RS_BIT => write!(f, "FEC_RS"),
+            Self::ETHTOOL_LINK_MODE_FEC_BASER_BIT => write!(f, "FEC_BASER"),
+            Self::ETHTOOL_LINK_MODE_FEC_LLRS_BIT => write!(f, "FEC_LLRS"),
         }
     }
 }

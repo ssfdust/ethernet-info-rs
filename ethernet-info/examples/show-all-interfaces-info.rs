@@ -5,10 +5,14 @@ fn main() {
     let ethernet_info_list = get_ethernet_info(None);
     for ethernet_info in ethernet_info_list {
         print!(
-            "Interface: {}, Port: {} ",
+            "Interface: {}, Port: {}, ",
             ethernet_info.name(),
             ethernet_info.port(),
         );
+        print!("Ports: ");
+        for supported in ethernet_info.ports() {
+            print!("{} ", supported);
+        }
         print!("Supported: ");
         for supported in ethernet_info.supported() {
             print!("{} ", supported);

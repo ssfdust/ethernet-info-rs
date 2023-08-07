@@ -2,7 +2,8 @@
 //! the port type, supported modes.
 //! The crate is based on the ioctl command, so it can only be used on Linux.
 //!
-//! # Examples
+//! Examples
+//! ----------------
 //! List all the interfaces' ethtool related information.
 //! ```
 //! use ethernet_info::get_ethernet_info;
@@ -10,6 +11,7 @@
 //! for interface_info in interfaces_eth_info {
 //!     println!("interface: {}", interface_info.name());
 //!     println!("Port: {}", interface_info.port());
+//!     println!("Supported Ports: {:?}", interface_info.ports());
 //!     println!("Supported: {:?}", interface_info.supported());
 //! }
 //! ```
@@ -21,6 +23,7 @@
 //! for interface_info in interfaces_eth_info {
 //!     println!("interface: {}", interface_info.name());
 //!     println!("Port: {}", interface_info.port());
+//!     println!("Supported Ports: {:?}", interface_info.ports());
 //!     println!("Supported: {:?}", interface_info.supported());
 //! }
 //! ```
@@ -31,6 +34,7 @@
 //! if let Ok(interface_info) = EthernetInfo::try_from("enp1s0") {
 //!     println!("interface: {}", interface_info.name());
 //!     println!("Port: {}", interface_info.port());
+//!     println!("Supported Ports: {:?}", interface_info.ports());
 //!     println!("Supported: {:?}", interface_info.supported());
 //! }
 //! ```
