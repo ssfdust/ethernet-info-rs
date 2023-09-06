@@ -30,7 +30,7 @@ impl TryFrom<&str> for EthtoolOutput {
             output.iter().map(|s| s.as_str()).collect(),
         );
         // Get the supported ports. We need to filter out the "[" and "]" characters.
-        let supported_ports = parse_ethtool_output(
+        let mut supported_ports = parse_ethtool_output(
             "Supported ports",
             output.iter().map(|s| s.as_str()).collect(),
         )
@@ -43,6 +43,23 @@ impl TryFrom<&str> for EthtoolOutput {
             }
         })
         .collect::<Vec<String>>();
+        let pause_link_modes = parse_ethtool_output(
+            "Supported pause frame use",
+            output.iter().map(|s| s.as_str()).collect(),
+        );
+        if pause_link_modes.contains(&"Symmetric".into()) {
+            supported_ports.push("Pause".into());
+        } else if pause_link_modes.contains(&"Receive-only".into()) {
+            supported_ports.push("Asym_Pause".into());
+        } else if pause_link_modes.contains(&"Transmit-only".into()) {
+            supported_ports.push("Asym_Pause".into());
+        }
+        for item in &output {
+            if item.contains("Supports auto-negotiation: Yes") {
+                supported_ports.push("Autoneg".into());
+            }
+        }
+        supported_ports.sort();
         // Get the port. If the port is not reported, we set it to None.
         let port_vec = parse_ethtool_output("Port", output.iter().map(|s| s.as_str()).collect());
         port = if port_vec.is_empty() {

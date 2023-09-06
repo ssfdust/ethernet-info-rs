@@ -139,10 +139,21 @@ impl EthtoolCommnad {
 }
 
 /// Convert string to i8 array.
-fn str_to_i8_arr(string: &str) -> [i8; IFNAMSIZ] {
+#[cfg(target_arch = "x86_64")]
+fn str_to_arr(string: &str) -> [i8; IFNAMSIZ] {
     let mut arr_u8 = [0i8; IFNAMSIZ];
     for (idx, ch) in string.bytes().enumerate() {
         arr_u8[idx] = ch as i8;
+    }
+    arr_u8
+}
+
+/// Convert string to u8 array.
+#[cfg(target_arch = "aarch64")]
+fn str_to_arr(string: &str) -> [u8; IFNAMSIZ] {
+    let mut arr_u8 = [0u8; IFNAMSIZ];
+    for (idx, ch) in string.bytes().enumerate() {
+        arr_u8[idx] = ch;
     }
     arr_u8
 }
@@ -197,7 +208,7 @@ impl CmdContext {
     /// Send ioctl command to kernel, which will fill the ifreq struct.
     pub fn send_ioctl(mut self, mut ecmd: EthtoolCommnad) -> Result<CmdContext, EthtoolError> {
         self.ifr = ifreq {
-            ifr_name: str_to_i8_arr(&self.devname),
+            ifr_name: str_to_arr(&self.devname),
             ifr_ifru: libc::__c_anonymous_ifr_ifru {
                 ifru_data: unsafe { transmute(&mut ecmd as *mut _) },
             },
