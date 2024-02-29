@@ -3,3 +3,4 @@ members = [
     "ethernet-info",
     "xtask",
 ]
+resolver = "2"

@@ -124,8 +124,7 @@ fn do_ioctl_get_ethernet_info(mut ctx: CmdContext) -> Result<EthernetInfo, Ethto
      * opposite of what it is expecting. We request length 0 below
      * (aka. invalid bitmap length) to get this info.
      */
-    ctx = ctx.send_ioctl(ecmd)?;
-    ecmd = ctx.get_ethtool_link_settings();
+    ecmd = ctx.get_ethtool_link_settings(ecmd)?;
     if ecmd.req.link_mode_masks_nwords >= 0 || ecmd.req.cmd != ETHTOOL_GLINKSETTINGS {
         return Err(EthtoolError::new(
             "Failed to determine number of words for link mode bitmaps",
@@ -137,8 +136,7 @@ fn do_ioctl_get_ethernet_info(mut ctx: CmdContext) -> Result<EthernetInfo, Ethto
      */
     ecmd.req.cmd = ETHTOOL_GLINKSETTINGS;
     ecmd.req.link_mode_masks_nwords = -ecmd.req.link_mode_masks_nwords;
-    ctx = ctx.send_ioctl(ecmd)?;
-    ecmd = ctx.get_ethtool_link_settings();
+    ecmd = ctx.get_ethtool_link_settings(ecmd)?;
 
     /* check the link_mode_masks_nwords again */
     if ecmd.req.link_mode_masks_nwords <= 0 || ecmd.req.cmd != ETHTOOL_GLINKSETTINGS {

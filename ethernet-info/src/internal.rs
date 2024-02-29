@@ -188,10 +188,20 @@ impl CmdContext {
     }
 
     /// Convert the ifreq struct which is filled by kernel to the EthtoolCommnad.
-    pub fn get_ethtool_link_settings(&self) -> EthtoolCommnad {
+    pub fn get_ethtool_link_settings(
+        &mut self,
+        mut ecmd: EthtoolCommnad,
+    ) -> Result<EthtoolCommnad, EthtoolError> {
         unsafe {
-            let ecmd = self.ifr.ifr_ifru.ifru_data as *mut EthtoolCommnad;
-            *ecmd
+            self.ifr = ifreq {
+                ifr_name: str_to_arr(&self.devname),
+                ifr_ifru: libc::__c_anonymous_ifr_ifru {
+                    ifru_data: { transmute(&mut ecmd as *mut _) },
+                },
+            };
+            let ret = ethtool_ioctl(self.fd, &mut self.ifr);
+            ret.map(|_| *(self.ifr.ifr_ifru.ifru_data as *mut EthtoolCommnad))
+                .map_err(|_| EthtoolError::new("Failed to get EthtoolCommnad"))
         }
     }
 
@@ -203,21 +213,5 @@ impl CmdContext {
     /// Get the device name.
     pub fn ifname(&self) -> &str {
         &self.devname
-    }
-
-    /// Send ioctl command to kernel, which will fill the ifreq struct.
-    pub fn send_ioctl(mut self, mut ecmd: EthtoolCommnad) -> Result<CmdContext, EthtoolError> {
-        self.ifr = ifreq {
-            ifr_name: str_to_arr(&self.devname),
-            ifr_ifru: libc::__c_anonymous_ifr_ifru {
-                ifru_data: unsafe { transmute(&mut ecmd as *mut _) },
-            },
-        };
-        let ret = unsafe { ethtool_ioctl(self.fd, &mut self.ifr) };
-        if ret.is_ok() {
-            Ok(self)
-        } else {
-            Err(EthtoolError::new("Failed to send EthtoolCommnad"))
-        }
     }
 }
